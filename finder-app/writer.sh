@@ -3,6 +3,7 @@
 
 writefile="$1"
 writestr="$2"
+WRITEDIR=/tmp/aeld-data
 
 if [ "$#" -ne 2 ]; then
    echo "Usage: $0 <writefile> <writestr>"
@@ -15,9 +16,9 @@ elif [ -z "$writestr" ]; then
    exit 1
 fi
 
-echo "${writestr}"
-echo "${writefile}"
-
+if [ ! -d "${WRITEDIR}" ];then
+   mkdir -p  ${WRITEDIR}
+fi
 
 echo "${writestr}" > "${writefile}"
 
