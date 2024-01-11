@@ -16,9 +16,9 @@ elif [ -z "$writestr" ]; then
    exit 1
 fi
 
-if [ ! -d "${WRITEDIR}" ];then
-   mkdir -p  ${WRITEDIR}
-fi
+
+mkdir -p  "$(dirname "${writefile}")"
+
 
 echo "${writestr}" > "${writefile}"
 
@@ -27,10 +27,9 @@ if [ ! -f "$1" ]; then
    exit 1
 fi
 
-if [ "$?" -ne 0 ];then
-   echo "Unable to create or write to ${writefile}"
+if [ $? -ne 0 ]; then
+   echo "Unable to create or write to "${writefile}""
    exit 1
-else
-   echo "File '${writefile}' created successfully"
-   exit 0
 fi
+
+exit 0

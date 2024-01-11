@@ -5,18 +5,17 @@ filesdir=$1
 searchstr=$2
 argscount=$#
 
-if [ -d $filesdir ]
-then
+if [ -d $filesdir ];then
    grep_result=$(grep -ri "$searchstr" "$filesdir") 
-   echo "${grep_result}"
-   #filecount=$(echo "$grep_result" | cut -d':'-f1 | sort -u | wc -l)
-   #echo "Number of files are ${filecount}"
-   # and the number of matching lines are ${grep_result}"
+   filecount=$(find "${filesdir}" -type f | wc -l)
+   mactching_count=$("${grep_Result}" | wc -l)
+   echo "Number of files are ${filecount} and the number of matching lines are ${grep_result}"
+   exit 0
 else
-   if [ $argscount -ne 2 ]; then
-      echo "Number of argunments is wrong"
+   if [ -z ${searchstr} ]; then
+      echo "Search string must be given as second argument"
       exit 1
-   elif [ ! -d "$filesdir"]; then
+   elif [ ! -d "$filesdir" ]; then
       echo "'${filesdir}' does not represent a directory on the filesystem"
       exit 1
    fi
