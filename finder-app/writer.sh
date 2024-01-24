@@ -3,7 +3,6 @@
 
 writefile="$1"
 writestr="$2"
-WRITEDIR=/tmp/aeld-data
 
 if [ "$#" -ne 2 ]; then
    echo "Usage: $0 <writefile> <writestr>"
