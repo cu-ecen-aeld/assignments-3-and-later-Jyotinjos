@@ -1,4 +1,5 @@
 #include "systemcalls.h"
+#include <errno.h>
 
 /**
  * @param cmd the command to execute with system()
@@ -9,7 +10,30 @@
 */
 bool do_system(const char *cmd)
 {
-
+    if(cmd == NULL)
+    {
+        return false;
+    }
+    int status = system(cmd);
+    
+    if(status<0)
+    {
+        perror("Perror returned");
+        return false;
+    }
+    else
+    {
+        //Successful condition
+        if(WIFEXITED(status))
+        {
+            int exit_status = WEXITSTATUS(status);
+            printf("Command exited normally, status: %d\n", exit_status);
+        } 
+        else{
+            printf("Command exited  abnormally!!!%d\n", errno);
+            return false;
+        }
+    }
 /*
  * TODO  add your code here
  *  Call the system() function with the command set in the cmd
@@ -43,11 +67,54 @@ bool do_exec(int count, ...)
     for(i=0; i<count; i++)
     {
         command[i] = va_arg(args, char *);
+        if(command[i][0] != '/' && command[i][0] != '-')
+        {
+            printf("Absolute path is not used!\n");
+            return false;
+        }
+        if(command[i][0] == '-')
+        {
+            continue;
+        }
     }
     command[count] = NULL;
+
     // this line is to avoid a compile warning before your implementation is complete
     // and may be removed
     command[count] = command[count];
+
+    if(command[0][0] != '/')
+    {
+        printf("Absolute path is not used!\n");
+        return false;
+    }
+
+    pid_t child_pid = fork();
+    if(child_pid < 0)
+    {
+        perror("Fork error");
+        return false;
+    }
+    if(child_pid == 0)
+    {
+        //Child process
+        execv(command[0], command);
+        perror("Execv error");
+        return false;
+    }
+    else{
+        //Parent process
+        int child_status;
+        wait(&child_status);
+        if(WIFEXITED(child_status))
+        {
+            printf("Child process exited normally, status: %d\n", WEXITSTATUS(child_status));
+        }
+        else{
+            printf("Child process exited abnormally!!!, Error status: %d\n", WEXITSTATUS(child_status));
+            return false;
+        }
+    }
 
 /*
  * TODO:
@@ -80,9 +147,64 @@ bool do_exec_redirect(const char *outputfile, int count, ...)
         command[i] = va_arg(args, char *);
     }
     command[count] = NULL;
+    va_end(args);
     // this line is to avoid a compile warning before your implementation is complete
     // and may be removed
-    command[count] = command[count];
+    //command[count] = command[count];
+    
+    int fd = open(outputfile, O_WRONLY|O_TRUNC|O_CREAT, 0644);
+    if(fd<0)
+    {
+        perror("open(...)");   
+        return false;
+    }
+    pid_t child_pid = fork();
+    bool status;
+    switch(child_pid)
+    {
+        case -1:
+        {
+            perror("Fork");
+            status = false;
+            break;
+        }
+        case 0:
+        {
+            //Child process
+            if(dup2(fd, 1) < 0)
+            {
+                perror("dup2(fd)");
+                status = false;
+            }
+            close(fd);
+            
+            if(execv(command[0], command)<0)
+            {
+                close(fd);
+                perror("execv");
+                status = false;
+            }
+            status = true;
+            break;
+        }
+        default:
+        {
+            
+            int child_status;
+            wait(&child_status);
+            if(WIFEXITED(child_status))
+            {
+                status = true;
+            }
+            else{
+                status = false;
+            }
+            close(fd);
+            
+            break;
+        }
+    }
+
 
 
 /*
@@ -93,7 +215,5 @@ bool do_exec_redirect(const char *outputfile, int count, ...)
  *
 */
 
-    va_end(args);
-
-    return true;
+    return status;
 }
