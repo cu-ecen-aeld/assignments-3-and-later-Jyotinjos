@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 # Author: Jyotin
 
 filesdir="$1"

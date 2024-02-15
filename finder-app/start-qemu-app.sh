@@ -16,7 +16,7 @@ INITRD_IMAGE=${OUTDIR}/initramfs.cpio.gz
 
 if [ ! -e ${KERNEL_IMAGE} ]; then
     echo "Missing kernel image at ${KERNEL_IMAGE}"
-    exit 1
+    exit 1./st
 fi
 if [ ! -e ${INITRD_IMAGE} ]; then
     echo "Missing initrd image at ${INITRD_IMAGE}"

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 #author is Jyotin
 
 writefile="$1"
