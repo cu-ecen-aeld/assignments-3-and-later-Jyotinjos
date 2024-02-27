@@ -1,3 +1,7 @@
+#ifndef THREADING_H
+#define THREADING_H
+
+
 #include <stdbool.h>
 #include <pthread.h>
 
@@ -19,7 +23,18 @@ struct thread_data{
      * Set to true if the thread completed with success, false
      * if an error occurred.
      */
+    // thread_data()
+    // {
+    //     thread_complete_success = false;
+    //     mMutex = NULL;
+    //     wait_to_obtain = 0;
+    //     wait_to_release_ms = 0;
+    // }
     bool thread_complete_success;
+    pthread_mutex_t *mMutex;
+    int wait_to_obtain;
+    int wait_to_release_ms;
+    
 };
 
 
@@ -38,3 +53,5 @@ struct thread_data{
 * @return true if the thread could be started, false if a failure occurred.
 */
 bool start_thread_obtaining_mutex(pthread_t *thread, pthread_mutex_t *mutex,int wait_to_obtain_ms, int wait_to_release_ms);
+
+#endif /* THREADING_H */
